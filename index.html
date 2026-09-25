@@ -1,703 +1,911 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission Control | Bit N Build 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --comic-yellow: #FFD100;
-            --comic-cyan: #00FFFF;
-            --comic-red: #FF3366;
-            --comic-black: #09090b;
-            --comic-paper: #f8f6f0;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIT N BUILD 2026 // MISSION CONTROL — MP ROUND</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Archivo+Black&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            comic: {
+              yellow: '#FFDE59',
+              cyan: '#00F0FF',
+              red: '#FF3366',
+              dark: '#0C0D11',
+              card: '#161822',
+              cream: '#F7F4EA',
+              folder: '#EEDB9E',
+              folderDark: '#D4BE77',
+            }
+          },
+          fontFamily: {
+            comic: ['Bangers', 'cursive'],
+            headline: ['"Archivo Black"', 'sans-serif'],
+            body: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'brutal-sm': '3px 3px 0px #000000',
+            'brutal': '6px 6px 0px #000000',
+            'brutal-lg': '10px 10px 0px #000000',
+            'brutal-xl': '14px 14px 0px #000000',
+          }
         }
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: var(--comic-paper);
-            color: var(--comic-black);
-            background-image: radial-gradient(#000 1px, transparent 1px);
-            background-size: 24px 24px;
-            background-position: -12px -12px;
-        }
-        h1, h2, h3, .comic-font {
-            font-family: 'Bangers', cursive;
-            letter-spacing: 0.05em;
-        }
-        .neo-brutal {
-            border: 4px solid var(--comic-black);
-            box-shadow: 6px 6px 0px var(--comic-black);
-            transition: all 0.2s ease-in-out;
-        }
-        .neo-brutal:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 8px 8px 0px var(--comic-black);
-        }
-        .neo-brutal-static {
-            border: 4px solid var(--comic-black);
-            box-shadow: 6px 6px 0px var(--comic-black);
-        }
-        details > summary {
-            list-style: none;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            #boot-sequence { display: none !important; }
-        }
-        
-        /* Toast Notification */
-        #toast {
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
-        }
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 2rem;
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    /* Halftone and Textures */
+    .halftone-bg {
+      background-color: #0c0d11;
+      background-image: radial-gradient(#26283b 15%, transparent 16%), radial-gradient(#1f2130 15%, transparent 16%);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+    .comic-border { border: 3.5px solid #000000; }
+    .comic-border-thick { border: 5px solid #000000; }
+
+    /* Boot Sequence */
+    #boot-sequence {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .boot-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Stamps & Animations */
+    .stamp-badge {
+      text-transform: uppercase;
+      font-family: 'Bangers', cursive;
+      letter-spacing: 0.12em;
+      border-width: 3.5px;
+      border-style: dashed;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-3.5deg);
+    }
+
+    .comic-btn {
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .comic-btn:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 9px 9px 0px #000;
+      }
+      .comic-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 2px 2px 0px #000;
+      }
+    }
+
+    /* Dossier transitions */
+    .mission-details-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease-out;
+    }
+    .mission-details-wrapper.is-open {
+      grid-template-rows: 1fr;
+    }
+    .mission-details-inner {
+      overflow: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0c0d11; border-left: 2px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #FFDE59; border: 2px solid #000; }
+    ::-webkit-scrollbar-thumb:hover { background: #00F0FF; }
+
+    /* Toast Notification */
+    #toast {
+      transition: bottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+    
+    /* Target offsets for anchor links */
+    :target { scroll-margin-top: 100px; }
+    :target > div { animation: highlight-pulse 2s ease-out; }
+    @keyframes highlight-pulse {
+      0%, 100% { box-shadow: 10px 10px 0px #000000; }
+      50% { box-shadow: 0px 0px 0px #FFDE59, 0 0 0 6px #FFDE59; }
+    }
+  </style>
 </head>
-<body class="antialiased overflow-x-hidden">
+<body class="halftone-bg text-slate-100 font-body antialiased min-h-screen selection:bg-comic-yellow selection:text-black pb-16 md:pb-0">
 
-    <!-- Boot Sequence -->
-    <div id="boot-sequence" class="fixed inset-0 z-50 flex items-center justify-center bg-black text-white comic-font text-4xl sm:text-6xl text-center" style="display: none;">
-        <div id="boot-text">CLASSIFIED FILE SYSTEM</div>
+  <!-- 1. Boot Sequence Overlay -->
+  <div id="boot-sequence" class="fixed inset-0 z-[9999] bg-black text-emerald-400 font-mono flex flex-col justify-center items-center p-4">
+    <div class="max-w-md w-full border border-emerald-400/30 p-6 shadow-[0_0_20px_rgba(52,211,153,0.1)]">
+      <div id="boot-text-1" class="text-sm sm:text-lg mb-2">> CLASSIFIED FILE SYSTEM</div>
+      <div id="boot-text-2" class="text-sm sm:text-lg mb-2 opacity-0">> AUTHENTICATING...</div>
+      <div id="boot-text-3" class="text-sm sm:text-lg mb-2 opacity-0">> ACCESS GRANTED</div>
+      <div id="boot-text-4" class="text-sm sm:text-lg text-comic-yellow font-bold mt-4 opacity-0 animate-pulse">> MISSION FILES UNLOCKED</div>
+      <div class="mt-4 h-1 w-full bg-emerald-900/30 overflow-hidden">
+        <div id="boot-progress" class="h-full bg-emerald-400 w-0 transition-all ease-linear"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- Toast Notification for Share -->
-    <div id="toast" class="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 bg-[var(--comic-cyan)] text-black px-6 py-3 border-4 border-black font-bold neo-brutal-static mb-8">
-        MISSION LINK COPIED TO CLIPBOARD
-    </div>
-
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-[#f8f6f0] border-b-4 border-black z-40 px-4 py-3 flex justify-between items-center">
-        <div class="text-2xl comic-font tracking-wider">BIT N BUILD 2026</div>
-        <div class="hidden md:flex gap-6 font-bold">
-            <a href="#missions" class="hover:text-[var(--comic-red)] transition-colors">MISSION FILES</a>
-            <a href="#judging" class="hover:text-[var(--comic-red)] transition-colors">JUDGING</a>
-            <a href="#ai-rules" class="hover:text-[var(--comic-red)] transition-colors">AI RULES</a>
-            <a href="#protocol" class="hover:text-[var(--comic-red)] transition-colors">PROTOCOL</a>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-comic-dark/95 backdrop-blur-md border-b-4 border-black px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="https://bitnbuild-lemon.vercel.app" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-comic-yellow">
+        <div class="w-10 h-10 bg-comic-yellow comic-border flex items-center justify-center shadow-brutal-sm font-comic text-2xl text-black group-hover:bg-comic-cyan transition-colors">B&B</div>
+        <div class="leading-tight">
+          <div class="font-headline tracking-tighter text-base sm:text-lg flex items-center gap-2">
+            BIT N BUILD 2026
+            <span class="hidden sm:inline-flex items-center gap-1.5 bg-comic-red/20 text-comic-red border border-comic-red px-2 py-0.5 rounded text-[11px] font-mono uppercase">MP ROUND</span>
+          </div>
         </div>
-        <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="hidden md:block bg-[var(--comic-yellow)] px-6 py-2 border-4 border-black font-bold hover:bg-[var(--comic-cyan)] transition-colors">
-            REGISTER
-        </a>
-    </nav>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 font-headline text-sm tracking-wide">
+        <a href="#missions" class="hover:text-comic-yellow transition-colors"><span class="text-comic-yellow">#</span> MISSION FILES</a>
+        <a href="#criteria" class="hover:text-comic-yellow transition-colors"><span class="text-comic-cyan">#</span> JUDGING</a>
+        <a href="#ai-rules" class="hover:text-comic-yellow transition-colors"><span class="text-comic-red">#</span> AI RULES</a>
+        <a href="#timeline" class="hover:text-comic-yellow transition-colors"><span class="text-slate-400">#</span> PROTOCOL</a>
+      </nav>
+      <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="hidden md:flex comic-btn bg-comic-yellow text-black font-headline text-sm px-5 py-2.5 comic-border shadow-brutal items-center gap-2 focus:outline-none focus:ring-4 focus:ring-comic-cyan">
+        REGISTER
+      </a>
+    </div>
+  </header>
 
+  <main>
     <!-- Hero Section -->
-    <header class="pt-32 pb-16 px-4 max-w-6xl mx-auto flex flex-col items-center text-center">
-        <div class="bg-black text-white px-4 py-1 text-sm font-bold uppercase tracking-widest mb-6 rotate-1">
-            BIT N BUILD 2026 | MP ROUND // MISSION CONTROL
-        </div>
-        <h1 class="text-6xl md:text-8xl lg:text-9xl uppercase mb-6 leading-none shadow-sm">
-            THE MISSION FILES<br><span id="hero-status-text" class="text-[var(--comic-red)]">ARE OPEN.</span>
-        </h1>
-        <p class="text-xl md:text-3xl font-bold mb-10 max-w-2xl bg-[var(--comic-cyan)] inline-block px-4 py-2 border-4 border-black -rotate-1">
-            6 MISSIONS. 36 HOURS. ONE CHALLENGE.
-        </p>
-
-        <div class="bg-white neo-brutal-static p-6 md:p-8 flex flex-col md:flex-row gap-8 items-center max-w-3xl w-full">
-            <div class="flex-1 text-left">
-                <div class="text-sm font-bold text-gray-500 mb-1">MISSION STATUS</div>
-                <div class="text-2xl font-bold flex items-center gap-2 text-black">
-                    <span id="status-indicator" class="w-4 h-4 rounded-full bg-yellow-500 animate-pulse"></span> 
-                    <span id="status-text">STANDBY</span>
-                </div>
-            </div>
-            <div class="flex-2 text-center">
-                <div id="countdown-label" class="text-sm font-bold text-gray-500 mb-1">MISSION UNLOCK IN</div>
-                <div id="countdown" class="text-5xl md:text-7xl comic-font tracking-widest">--:--:--</div>
-                <div id="deadline-label" class="text-xs font-bold mt-2">UNLOCK: 26 SEP 2026 · 12:00 AM IST</div>
-            </div>
-        </div>
-
-        <a href="#missions" class="mt-12 bg-black text-white comic-font text-2xl px-12 py-4 border-4 border-black hover:bg-[var(--comic-red)] hover:text-black transition-colors">
-            ENTER MISSION CONTROL
-        </a>
-    </header>
-
-    <!-- Mission Intel Strip -->
-    <section class="border-y-4 border-black bg-[var(--comic-yellow)] overflow-hidden">
-        <div class="flex flex-wrap md:flex-nowrap divide-y-4 md:divide-y-0 md:divide-x-4 divide-black">
-            <div class="w-full md:w-auto flex-1 p-4 text-center font-bold text-lg md:text-xl">36 HOURS</div>
-            <div class="w-full md:w-auto flex-1 p-4 text-center font-bold text-lg md:text-xl">2–4 MEMBERS</div>
-            <div class="w-full md:w-auto flex-1 p-4 text-center font-bold text-lg md:text-xl">AI TOOLS ALLOWED</div>
-            <div class="w-full md:w-auto flex-1 p-4 text-center font-bold text-lg md:text-xl">₹1,50,000+ PRIZE POOL</div>
-            <div class="w-full md:w-auto flex-1 p-4 text-center font-bold text-lg md:text-xl">ONLINE · MP ROUND</div>
-        </div>
-    </section>
-
-    <!-- Important Dates -->
-    <section class="max-w-4xl mx-auto px-4 py-12 flex flex-col md:flex-row gap-6 justify-center">
-        <div class="bg-white neo-brutal-static p-4 text-center flex-1">
-            <div class="text-sm font-bold text-gray-500">MISSION RELEASE</div>
-            <div class="font-bold">26 SEPTEMBER · 12:00 AM IST</div>
-        </div>
-        <div class="bg-[var(--comic-cyan)] neo-brutal-static p-4 text-center flex-1">
-            <div class="text-sm font-bold text-black">BUILD WINDOW</div>
-            <div class="font-bold">26 SEP → 27 SEP · 12:00 PM IST</div>
-        </div>
-        <div class="bg-[var(--comic-red)] text-white neo-brutal-static p-4 text-center flex-1">
-            <div class="text-sm font-bold opacity-90">REGISTRATION DEADLINE</div>
-            <div class="font-bold">25 SEPTEMBER · EOD</div>
-        </div>
-    </section>
-
-    <!-- Introduction -->
-    <section id="missions" class="max-w-4xl mx-auto px-4 pt-12 pb-8 text-center">
-        <h2 class="text-5xl md:text-7xl mb-4">THE MISSION FILES</h2>
-        <p class="text-xl md:text-2xl font-bold max-w-2xl mx-auto">
-            Six challenge directions.<br>
-            Six different ways to think.<br>
-            One 36-hour build window.
-        </p>
-        <p class="mt-6 font-semibold text-lg bg-black text-white inline-block px-4 py-2 rotate-1">
-            Find the challenge that speaks to your team.
-        </p>
-    </section>
-
-    <!-- Mission Files Container -->
-    <main class="max-w-5xl mx-auto px-4 pb-20 space-y-8" id="missions-container">
+    <section class="relative pt-8 pb-10 px-4 overflow-hidden border-b-4 border-black">
+      <div class="max-w-6xl mx-auto relative z-10">
         
-        <!-- Mission 001 -->
-        <details class="bg-[#FFF9D2] neo-brutal group pointer-events-none" id="mission-001">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
-                <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 001</div>
-                    <h3 class="text-4xl md:text-5xl text-[var(--comic-red)]">BUILD THE FUTURE</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: WEB DEVELOPMENT</div>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-001">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
-                </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-001">
-                <!-- Content dynamically injected at release time -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="inline-flex items-center gap-2 bg-comic-card comic-border px-3.5 py-1.5 shadow-brutal-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-comic-yellow"></span>
+            <span class="font-mono text-xs font-bold text-slate-300 uppercase tracking-wider">
+              CLEARANCE: <span class="text-comic-yellow">UNLOCKED</span> // MP SECTOR
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-comic-card comic-border p-6 sm:p-10 shadow-brutal-lg relative mb-6">
+          <div class="inline-block mb-3">
+            <p class="font-mono text-xs sm:text-sm font-bold text-comic-cyan uppercase tracking-widest flex items-center gap-2">
+              <span class="text-comic-red">►►</span> BIT N BUILD 2026 // MP ROUND
+            </p>
+          </div>
+
+          <h1 class="font-comic text-5xl sm:text-7xl lg:text-8xl tracking-wider text-comic-yellow leading-none mb-3 drop-shadow-[4px_4px_0px_#000]">
+            THE MISSION FILES <br><span class="text-white">ARE OPEN.</span>
+          </h1>
+          <p class="font-headline text-lg sm:text-2xl text-slate-200 tracking-tight max-w-2xl mb-8">
+            6 MISSIONS · 36 HOURS · ONE CHALLENGE
+          </p>
+
+          <!-- Countdown UI -->
+          <div class="bg-black/80 comic-border p-4 sm:p-6 shadow-brutal mb-8 max-w-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 bg-comic-red rounded-full animate-ping"></span>
+                <span id="status-indicator" class="font-mono text-xs uppercase tracking-wider text-slate-400 font-bold">MISSION STATUS: ACTIVE</span>
+              </div>
+              <div class="font-mono text-xs text-comic-cyan font-bold">DEADLINE: 27 SEP · 12:00 PM IST</div>
             </div>
-        </details>
 
-        <!-- Mission 002 -->
-        <details class="bg-[#E6F9FF] neo-brutal group pointer-events-none" id="mission-002">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
-                <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 002</div>
-                    <h3 class="text-4xl md:text-5xl text-blue-600">TEACH THE MACHINE</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: AI / MACHINE LEARNING</div>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-002">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
-                </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-002"></div>
-        </details>
+            <div id="countdown-display" class="grid grid-cols-3 gap-3 sm:gap-6 text-center">
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="hours" class="font-comic text-4xl sm:text-6xl text-comic-yellow tracking-wider">36</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">HOURS</div>
+              </div>
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="minutes" class="font-comic text-4xl sm:text-6xl text-comic-cyan tracking-wider">00</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">MINUTES</div>
+              </div>
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="seconds" class="font-comic text-4xl sm:text-6xl text-comic-red tracking-wider">00</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">SECONDS</div>
+              </div>
+            </div>
+            <div id="countdown-closed" class="hidden text-center py-6 bg-comic-red comic-border shadow-brutal-sm">
+              <span class="font-comic text-4xl sm:text-5xl text-white tracking-widest">BUILD WINDOW CLOSED</span>
+            </div>
+          </div>
 
-        <!-- Mission 003 -->
-        <details class="bg-[#FFE6E6] neo-brutal group pointer-events-none" id="mission-003">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
-                <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 003</div>
-                    <h3 class="text-4xl md:text-5xl text-red-600">BREAK THE SYSTEM</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: CYBERSECURITY</div>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-003">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
-                </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-003"></div>
-        </details>
+          <a href="#missions" class="comic-btn inline-flex bg-comic-yellow text-black font-headline text-base px-7 py-3.5 comic-border shadow-brutal items-center gap-3 focus:outline-none">
+            <span>ENTER MISSION CONTROL</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"/></svg>
+          </a>
+        </div>
 
-        <!-- Mission 004 -->
-        <details class="bg-[#F0E6FF] neo-brutal group pointer-events-none" id="mission-004">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
-                <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 004</div>
-                    <h3 class="text-4xl md:text-5xl text-purple-600">TRUST WITHOUT PERMISSION</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: BLOCKCHAIN / DECENTRALIZATION</div>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-004">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
-                </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-004"></div>
-        </details>
+        <!-- Mission Intel Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mt-6">
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-white">36 HOURS</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-comic-cyan">2–4 MEMBERS</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center col-span-2 md:col-span-1">
+            <span class="font-headline text-xl text-comic-yellow">AI ALLOWED</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-emerald-400">₹1,50K+ PRIZES</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-comic-red text-sm sm:text-base">ONLINE · MP</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Mission 005 -->
-        <details class="bg-[#E6FFE6] neo-brutal group pointer-events-none" id="mission-005">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
-                <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 005</div>
-                    <h3 class="text-4xl md:text-5xl text-green-700">DATA HAS A STORY</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: DATA + AI</div>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-005">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
-                </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-005"></div>
-        </details>
+    <!-- Mission Files Section -->
+    <section id="missions" class="py-16 px-4 max-w-7xl mx-auto">
+      <div class="mb-10 flex flex-col border-b-4 border-black pb-6">
+        <h2 class="font-comic text-5xl sm:text-7xl text-white tracking-wider drop-shadow-[3px_3px_0px_#000]">THE MISSION FILES</h2>
+      </div>
 
-        <!-- Mission 006 -->
-        <details class="bg-gray-100 neo-brutal group pointer-events-none" id="mission-006">
-            <summary class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-transparent group-open:border-black cursor-pointer">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- MISSION 001 -->
+        <article id="mission-001" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 001</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-yellow px-2 py-0.5 self-start mb-3 border border-black">WEB DEVELOPMENT</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">BUILD THE FUTURE</h3>
+            
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-1">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
                 <div>
-                    <div class="text-sm font-bold bg-black text-white px-2 py-1 inline-block mb-2">MISSION FILE // 006</div>
-                    <h3 class="text-4xl md:text-5xl text-black">OPEN MISSION</h3>
-                    <div class="font-bold text-lg mt-1 tracking-wide uppercase">DOMAIN: ANY DOMAIN</div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">The modern web is cluttered with tools that optimize minor inconveniences while ignoring foundational systemic issues in public utility, accessibility, and community infrastructure.</p>
                 </div>
-                <div class="mt-4 md:mt-0 flex flex-col items-end gap-2" id="mission-meta-006">
-                    <span class="border-2 border-yellow-500 text-yellow-700 font-bold px-3 py-1 text-sm bg-yellow-100 rounded-full">🔒 CLASSIFIED</span>
-                    <span class="font-bold underline text-gray-500 mt-2">ACCESS OPENS 26 SEP</span>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a highly useful web-based solution targeted at a specific, underserved user group. Move beyond basic CRUD logic to deliver genuine real-world utility.</p>
                 </div>
-            </summary>
-            <div class="p-6 md:p-8 border-t-4 border-black bg-white grid gap-6" id="mission-content-006"></div>
-        </details>
-    </main>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Productivity</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Accessibility</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Public Services</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Dev Tools</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Automation</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-red">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-red mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The core value of your application must not rely on the user manually entering massive amounts of data just to get started.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">An intuitive interface where a target user immediately grasps the utility. Smooth state management and resilience.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-001')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border hover:bg-slate-800 focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-001', 'BUILD THE FUTURE')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold hover:bg-[#1EBE5D] focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-yellow font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-black/20" aria-controls="mission-details-1">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 002 -->
+        <article id="mission-002" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 002</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-cyan px-2 py-0.5 self-start mb-3 border border-black">AI / MACHINE LEARNING</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">TEACH THE MACHINE</h3>
+            
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-2">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">AI has moved past party tricks. The next wave of intelligent software requires models that assist human judgment, automate complex reasoning, or process unstructured chaos into structured insight.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a system where artificial intelligence solves a meaningful problem rather than simply being pasted in as a cosmetic chat feature.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Prediction</span>
+                    <span class="bg-white comic-border px-2 py-0.5">NLP workflows</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Computer Vision</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Autonomous Agents</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-cyan">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-cyan mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The AI must be in the critical path of the application. If you remove the AI component, the application should fail to fulfill its primary purpose.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Proper prompt engineering, edge-case handling (what happens when the AI hallucinates?), and an architecture that gracefully integrates inference.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-002')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-002', 'TEACH THE MACHINE')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-cyan font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-black/20" aria-controls="mission-details-2">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 003 -->
+        <article id="mission-003" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 003</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-red px-2 py-0.5 self-start mb-3 border border-black">CYBERSECURITY</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">BREAK THE SYSTEM</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-3">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">As digital ecosystems expand, the attack surface grows exponentially. Relying solely on enterprise firewalls is no longer enough; security must be accessible and systemic.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a defense mechanism, educational simulator, or monitoring tool that helps organizations or individuals understand, prevent, or mitigate digital threats.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Phishing Defense</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Zero-Knowledge Auth</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Fraud Mitigation</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-red">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-red mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The solution must include a frontend interface that successfully explains the threat or defense action to a non-technical end user.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Practical implementation of cryptography, secure state handling, and a working demonstration of a mitigated vulnerability.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-003')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-003', 'BREAK THE SYSTEM')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-red font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-3">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 004 -->
+        <article id="mission-004" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 004</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-white px-2 py-0.5 self-start mb-3 border border-black">BLOCKCHAIN / DECENTRALIZATION</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">TRUST WITHOUT PERMISSION</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-4">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">True decentralized engineering solves issues of verifiable trust, ownership, and censorship-resistance that centralized databases cannot handle natively.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a blockchain application or smart contract system that establishes verifiable trust or facilitates unmediated peer interactions.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Digital Identity</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Supply Chain Auth</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Verifiable Credentials</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-slate-800">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-slate-800 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">You must be able to clearly justify why a standard Postgres/MongoDB database could not solve this problem just as well.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Clean smart contract logic, secure handling of wallets/transactions, and an interface that abstracts Web3 complexity from the user.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-004')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-004', 'TRUST WITHOUT PERMISSION')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-white font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-4">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 005 -->
+        <article id="mission-005" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 005</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-purple-400 px-2 py-0.5 self-start mb-3 border border-black">DATA + AI</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">DATA HAS A STORY</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-5">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">We are drowning in raw data feeds but starving for actionable insight. Complex datasets are useless if they cannot be interpreted by decision-makers.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Turn raw data streams into compelling, interactive visual artifacts or dashboards that drive better, faster choices.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Real-time Analytics</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Predictive Forecasting</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Interactive Visualization</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-purple-500">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-purple-700 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The final output must recommend or facilitate an actionable decision, not just present a passive chart.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">High-performance rendering of datasets, clear visual hierarchy, and an architecture capable of processing incoming data states.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-005')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-005', 'DATA HAS A STORY')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-purple-400 font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-5">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 006 -->
+        <article id="mission-006" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 006</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-emerald-400 px-2 py-0.5 self-start mb-3 border border-black">OPEN DOMAIN</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">OPEN MISSION</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-6">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">Innovation doesn't fit into neat predefined boxes. Some of the best engineering solutions solve niche, deeply personal, or radically ambitious problems.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Find a pressing problem in the world, define the constraints yourself, and build a meaningful technological solution using whatever stack serves it best.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Healthcare</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Climate/Agritech</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Social Impact</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Fintech</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-emerald-500">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-emerald-700 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The problem must be a real, verifiable issue affecting actual people, not a contrived inconvenience invented just to use a specific framework.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Deep domain understanding, empathy for the end user, and an architecture that matches the scale of the problem being solved.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-006')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-006', 'OPEN MISSION')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-emerald-400 font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-6">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <!-- Anti-CRUD & AI Doctrine -->
-    <section id="ai-rules" class="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
-        <div class="bg-[var(--comic-red)] text-white neo-brutal-static p-8 -rotate-1 flex flex-col justify-center">
-            <h3 class="text-4xl md:text-5xl mb-6">DON'T BUILD ANOTHER CRUD APP.</h3>
-            <div class="space-y-4 font-bold text-lg leading-relaxed">
-                <p>A login page + dashboard + database isn't innovation by itself.</p>
-                <p>A chatbot wrapper isn't automatically an AI solution.</p>
-                <p>Adding blockchain doesn't automatically make a project decentralized.</p>
-                <p>Using five technologies doesn't automatically make a project technically impressive.</p>
-            </div>
-            <div class="mt-8 bg-black p-4 text-center font-bold text-xl md:text-2xl rotate-1">
-                USE THE 36 HOURS TO BUILD SOMETHING WORTH SHOWING.<br>
-                <span class="text-[var(--comic-yellow)]">SHOW US SOMETHING REAL.</span>
-            </div>
+    <section id="ai-rules" class="py-12 px-4 max-w-6xl mx-auto">
+      
+      <!-- Anti-CRUD -->
+      <div class="bg-comic-red text-white comic-border-thick p-6 sm:p-10 shadow-brutal-xl mb-12 text-center transform -rotate-1">
+        <h3 class="font-comic text-4xl sm:text-6xl tracking-widest mb-4">DON'T BUILD ANOTHER CRUD APP.</h3>
+        <p class="font-headline text-lg sm:text-2xl text-white/90 max-w-3xl mx-auto mb-6 leading-snug">
+          A login page + a dashboard + a database isn't innovation by itself. Use the 36 hours to create something that actually solves a meaningful problem.
+        </p>
+        <div class="inline-block bg-black text-comic-yellow font-comic text-3xl px-6 py-2 comic-border shadow-[4px_4px_0px_#fff]">
+          SHOW US SOMETHING REAL.
         </div>
+      </div>
 
-        <div class="bg-white neo-brutal-static p-8 rotate-1">
-            <div class="inline-block bg-[var(--comic-yellow)] px-4 py-2 border-4 border-black font-bold text-xl mb-4 -rotate-2">
-                WAIT... CAN I USE CLAUDE?
+      <!-- AI Rules -->
+      <div class="bg-comic-card comic-border-thick p-6 sm:p-12 shadow-brutal-xl">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+          <div class="flex-1">
+            <div class="bg-comic-yellow text-black font-comic text-2xl sm:text-4xl p-4 comic-border shadow-brutal inline-block mb-6 relative">
+              CAN I USE CLAUDE?
+              <div class="absolute -bottom-4 left-8 border-[12px] border-transparent border-t-comic-yellow w-0 h-0"></div>
             </div>
-            <h3 class="text-6xl text-[var(--comic-cyan)] mb-2">YES.</h3>
-            <p class="font-bold text-xl mb-6">AI IS ALLOWED.<br>USE THE TOOLS YOU NEED.<br>BUT YOU OWN WHAT YOU SUBMIT.</p>
-            
-            <p class="text-sm font-bold text-gray-500 uppercase mb-2">YOU MAY USE:</p>
-            <ul class="font-semibold flex flex-wrap gap-2 mb-6">
-                <li class="bg-gray-200 px-2 border-2 border-black">Claude Code</li>
-                <li class="bg-gray-200 px-2 border-2 border-black">ChatGPT</li>
-                <li class="bg-gray-200 px-2 border-2 border-black">Gemini</li>
-                <li class="bg-gray-200 px-2 border-2 border-black">Cursor</li>
-                <li class="bg-gray-200 px-2 border-2 border-black">GitHub Copilot</li>
-                <li class="bg-gray-200 px-2 border-2 border-black">Other AI tools</li>
+            <div class="font-comic text-7xl sm:text-9xl text-comic-cyan drop-shadow-[5px_5px_0px_#000] tracking-wider leading-none mb-6">YES.</div>
+            <div class="flex flex-wrap gap-2 text-slate-300 font-mono text-xs sm:text-sm">
+              <span class="bg-white/10 px-3 py-1 comic-border">Claude Code</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">ChatGPT</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Gemini</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Cursor</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">GitHub Copilot</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Other AI dev tools</span>
+            </div>
+          </div>
+          
+          <div class="flex-1 bg-black p-6 sm:p-8 comic-border border-white/20">
+            <h4 class="font-headline text-2xl text-white mb-4">AI IS A TOOL.<br>NOT YOUR TEAM.</h4>
+            <p class="font-body text-slate-300 mb-6 text-sm">
+              AI-native development is highly encouraged. However, your team must be able to strictly adhere to the following when the clock stops:
+            </p>
+            <ul class="space-y-3 font-comic text-2xl tracking-widest text-comic-yellow">
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-yellow rounded-full"></span> EXPLAIN IT.</li>
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-cyan rounded-full"></span> DEMO IT.</li>
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-red rounded-full"></span> DEFEND IT.</li>
             </ul>
-
-            <div class="bg-black text-white p-4 font-bold border-4 border-[var(--comic-red)]">
-                <p class="text-2xl comic-font mb-2 text-[var(--comic-yellow)]">AI IS A TOOL. NOT YOUR TEAM.</p>
-                <p class="text-sm font-normal mb-3">AI-generated code is allowed. Teams are not required to hand-write everything. However, participants are responsible for understanding and being able to explain their implementation, architecture, important decisions and use of AI.</p>
-                <p class="text-lg">Your team should be able to:<br>
-                <span class="text-[var(--comic-cyan)]">EXPLAIN IT. DEMO IT. DEFEND IT.</span></p>
-            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Judging Criteria -->
-    <section id="judging" class="max-w-5xl mx-auto px-4 py-16">
-        <h2 class="text-5xl md:text-6xl text-center mb-10">WHAT MAKES A GREAT BUILD?</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white neo-brutal-static p-6">
-                <div class="comic-font text-3xl text-gray-300">01</div>
-                <h4 class="text-2xl comic-font mb-2">PROBLEM</h4>
-                <p class="font-bold">Did you identify something genuinely worth solving?</p>
-            </div>
-            <div class="bg-white neo-brutal-static p-6">
-                <div class="comic-font text-3xl text-gray-300">02</div>
-                <h4 class="text-2xl comic-font mb-2">INGENUITY</h4>
-                <p class="font-bold">Is your approach more thoughtful than the obvious solution?</p>
-            </div>
-            <div class="bg-white neo-brutal-static p-6">
-                <div class="comic-font text-3xl text-gray-300">03</div>
-                <h4 class="text-2xl comic-font mb-2">TECHNOLOGY</h4>
-                <p class="font-bold">Did you choose technology because it helped, or because it sounded impressive?</p>
-            </div>
-            <div class="bg-white neo-brutal-static p-6">
-                <div class="comic-font text-3xl text-gray-300">04</div>
-                <h4 class="text-2xl comic-font mb-2">EXECUTION</h4>
-                <p class="font-bold">Does the solution actually work?</p>
-            </div>
-            <div class="bg-white neo-brutal-static p-6">
-                <div class="comic-font text-3xl text-gray-300">05</div>
-                <h4 class="text-2xl comic-font mb-2">IMPACT</h4>
-                <p class="font-bold">Could it matter beyond this hackathon?</p>
-            </div>
-            <div class="bg-[var(--comic-yellow)] neo-brutal-static p-6 border-4 border-black">
-                <div class="comic-font text-3xl text-black">06</div>
-                <h4 class="text-2xl comic-font mb-2">OWNERSHIP</h4>
-                <p class="font-bold">Can your team explain and defend what you built?</p>
-            </div>
+    <section id="criteria" class="py-16 px-4 max-w-7xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h2 class="font-comic text-5xl sm:text-6xl text-white tracking-wider">JUDGING PILLARS</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">01</span>
+          <h3 class="font-comic text-3xl text-comic-cyan mb-2">PROBLEM</h3>
+          <p class="text-sm text-slate-300 font-body">Is it actually worth solving? Real pain points beat theoretical inconveniences.</p>
         </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">02</span>
+          <h3 class="font-comic text-3xl text-comic-cyan mb-2">INGENUITY</h3>
+          <p class="text-sm text-slate-300 font-body">Is your approach interesting? Clever architectures and original UX paradigms stand out.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">03</span>
+          <h3 class="font-comic text-3xl text-comic-yellow mb-2">TECHNOLOGY</h3>
+          <p class="text-sm text-slate-300 font-body">Did you choose the right tools? Purposeful tech selection over gratuitous complexity.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">04</span>
+          <h3 class="font-comic text-3xl text-emerald-400 mb-2">EXECUTION</h3>
+          <p class="text-sm text-slate-300 font-body">Does it actually work? A functional interactive path beats an elaborate theoretical pitch deck.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">05</span>
+          <h3 class="font-comic text-3xl text-purple-400 mb-2">IMPACT</h3>
+          <p class="text-sm text-slate-300 font-body">Could it matter beyond the hackathon? Solutions that have genuine longevity.</p>
+        </div>
+        <div class="bg-comic-yellow text-black comic-border-thick p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-black/60 mb-1">06 // MANDATORY CRITICAL</span>
+          <h3 class="font-comic text-3xl mb-2">OWNERSHIP</h3>
+          <p class="text-sm font-bold font-body">Can your team explain and defend what you built? Knowing your own architecture is strictly required.</p>
+        </div>
+      </div>
     </section>
 
-    <!-- 36 Hour Protocol & Demo -->
-    <section id="protocol" class="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-12 border-t-4 border-black">
-        <div>
-            <h3 class="text-4xl comic-font mb-6">36-HOUR PROTOCOL</h3>
-            <p class="text-sm font-bold text-gray-500 uppercase mb-6">This is guidance rather than a mandatory internal schedule.</p>
-            
-            <div class="space-y-4 font-bold text-xl bg-white p-6 neo-brutal-static">
-                <div class="flex justify-between items-center text-[var(--comic-red)]">
-                    <span>00:00</span><span>MISSION UNLOCK</span>
-                </div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="text-center">UNDERSTAND</div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="text-center">PROTOTYPE</div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="text-center">BUILD</div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="text-center">TEST</div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="text-center">POLISH</div>
-                <div class="text-center text-gray-400">↓</div>
-                <div class="flex justify-between items-center text-[var(--comic-cyan)]">
-                    <span>36:00</span><span>SHIP</span>
-                </div>
-            </div>
+    <!-- 36-Hour Protocol & Submission -->
+    <section id="timeline" class="py-16 px-4 bg-comic-dark/60 border-y-4 border-black">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="font-comic text-4xl sm:text-5xl text-center text-white tracking-wider mb-12">36-HOUR PROTOCOL</h2>
+        
+        <!-- Timeline Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-7 gap-3 mb-16 text-center">
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-comic-cyan mb-1">00:00</div>
+            <div class="font-headline text-xs sm:text-sm text-white">UNLOCK</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 1</div>
+            <div class="font-headline text-xs sm:text-sm text-white">UNDERSTAND</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 2</div>
+            <div class="font-headline text-xs sm:text-sm text-white">PROTOTYPE</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 3</div>
+            <div class="font-headline text-xs sm:text-sm text-white">BUILD</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 4</div>
+            <div class="font-headline text-xs sm:text-sm text-white">TEST</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 5</div>
+            <div class="font-headline text-xs sm:text-sm text-white">POLISH</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm col-span-2 md:col-span-1">
+            <div class="font-mono text-[10px] text-comic-red mb-1">36:00</div>
+            <div class="font-headline text-xs sm:text-sm text-white">SHIP</div>
+          </div>
         </div>
 
-        <div>
-            <h3 class="text-4xl comic-font mb-6 bg-black text-white inline-block px-4 py-1 -rotate-1">WHEN THE CLOCK HITS ZERO</h3>
-            <p class="font-bold text-lg mb-6">Your team should be ready to show:</p>
-            <ul class="space-y-4">
-                <li class="bg-white neo-brutal-static p-3"><span class="font-bold text-[var(--comic-red)] mr-2">01 — THE PROBLEM</span> What problem are you solving?</li>
-                <li class="bg-white neo-brutal-static p-3"><span class="font-bold text-[var(--comic-red)] mr-2">02 — THE SOLUTION</span> What did you build?</li>
-                <li class="bg-white neo-brutal-static p-3"><span class="font-bold text-[var(--comic-red)] mr-2">03 — THE DEMO</span> Show the working product.</li>
-                <li class="bg-white neo-brutal-static p-3"><span class="font-bold text-[var(--comic-red)] mr-2">04 — THE ENGINEERING</span> How does it work?</li>
-                <li class="bg-white neo-brutal-static p-3"><span class="font-bold text-[var(--comic-red)] mr-2">05 — THE WHY</span> Why does your approach matter?</li>
-                <li class="bg-[var(--comic-yellow)] neo-brutal-static p-3"><span class="font-bold text-black mr-2">06 — THE OWNERSHIP</span> Can you explain and defend your decisions?</li>
-            </ul>
+        <!-- Submission Rules -->
+        <div class="bg-comic-card comic-border p-8 shadow-brutal-lg max-w-4xl mx-auto">
+          <h3 class="font-comic text-4xl text-comic-yellow mb-6">WHEN THE CLOCK HITS ZERO</h3>
+          <p class="font-body text-slate-300 text-sm mb-6">Teams should be prepared to directly demonstrate the following during evaluation:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 font-mono text-xs text-slate-300">
+            <div><span class="text-white font-bold">01 — THE PROBLEM:</span> What did you identify?</div>
+            <div><span class="text-white font-bold">02 — YOUR SOLUTION:</span> What did you build?</div>
+            <div><span class="text-white font-bold">03 — WORKING PRODUCT:</span> Show the actual product.</div>
+            <div><span class="text-white font-bold">04 — TECHNOLOGY:</span> What did you use and why?</div>
+            <div><span class="text-white font-bold">05 — IMPACT:</span> Why does this matter?</div>
+            <div><span class="text-white font-bold">06 — OWNERSHIP:</span> Can you explain it?</div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Final CTA -->
-    <section class="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div class="bg-[var(--comic-cyan)] neo-brutal-static p-8 md:p-12 rotate-1">
-            <h2 class="text-5xl md:text-7xl mb-4">THE CLOCK IS RUNNING.</h2>
-            <p class="text-2xl md:text-4xl comic-font tracking-wide mb-8">36 HOURS. 6 MISSIONS. ONE SHOT.</p>
-            <p class="text-xl font-bold mb-6">READY?</p>
-            
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="bg-[var(--comic-red)] text-white text-xl comic-font tracking-widest px-8 py-4 border-4 border-black hover:bg-black hover:text-white transition-colors">
-                    ENTER THE CHALLENGE
-                </a>
-                <a href="https://bitnbuild-lemon.vercel.app" class="bg-white text-black text-xl comic-font tracking-widest px-8 py-4 border-4 border-black hover:bg-[var(--comic-yellow)] transition-colors">
-                    BACK TO BIT N BUILD
-                </a>
-            </div>
+    <section class="py-20 px-4 max-w-4xl mx-auto text-center">
+      <div class="bg-comic-dark comic-border-thick p-8 sm:p-14 shadow-brutal-xl">
+        <h2 class="font-comic text-5xl sm:text-7xl lg:text-8xl text-white tracking-wider leading-none mb-4 drop-shadow-[4px_4px_0px_#000]">
+          THE CLOCK IS RUNNING.
+        </h2>
+        <p class="font-headline text-xl sm:text-3xl text-comic-yellow tracking-tight mb-8">
+          36 HOURS. 6 MISSIONS. ONE SHOT.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto comic-btn bg-comic-yellow text-black font-headline text-lg px-8 py-4 comic-border shadow-brutal font-black flex justify-center items-center gap-2">
+            ENTER THE CHALLENGE
+          </a>
+          <a href="https://bitnbuild-lemon.vercel.app" class="w-full sm:w-auto comic-btn bg-slate-800 text-white font-headline text-sm px-6 py-4 comic-border shadow-brutal flex justify-center items-center hover:bg-slate-700">
+            BACK TO BIT N BUILD
+          </a>
         </div>
+      </div>
     </section>
+  </main>
 
-    <!-- Mobile Sticky CTA -->
-    <div class="md:hidden fixed bottom-0 w-full bg-black border-t-4 border-white z-50 flex">
-        <div class="flex-1 text-white text-center font-bold py-3 text-sm border-r-2 border-white">26–27 SEPTEMBER</div>
-        <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="flex-1 bg-[var(--comic-yellow)] text-center font-bold py-3 text-sm hover:bg-[var(--comic-cyan)] transition-colors">REGISTER</a>
+  <footer class="border-t-4 border-black bg-comic-card py-10 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <div>
+        <div class="font-headline text-base text-white">BIT N BUILD 2026 // MP ROUND</div>
+        <p class="font-mono text-xs text-slate-400 mt-1">26–27 SEPTEMBER 2026</p>
+        <p class="font-mono text-[10px] text-slate-500 mt-1">GDG ON CAMPUS LNCTS × GDG ON CAMPUS CRCE</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4 font-mono text-xs text-comic-yellow">
+        <a href="https://bitnbuild-lemon.vercel.app" class="hover:underline">Official Website</a>
+        <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="hover:underline text-comic-cyan">Registration</a>
+      </div>
     </div>
+  </footer>
 
-    <!-- Footer -->
-    <footer class="bg-black text-white text-center py-12 px-4 pb-24 md:pb-12 border-t-8 border-[var(--comic-red)]">
-        <h2 class="comic-font text-4xl mb-2">BIT N BUILD 2026</h2>
-        <p class="font-bold text-lg mb-1">MP ROUND</p>
-        <p class="text-gray-400 font-bold mb-6">26–27 SEPTEMBER 2026</p>
-        
-        <p class="bg-[var(--comic-yellow)] text-black inline-block px-4 py-1 text-sm font-bold tracking-widest border-2 border-white mb-6">TOP 2 MP TEAMS → MUMBAI GRAND FINALE</p><br>
-        <p class="text-[var(--comic-yellow)] font-bold text-xl mb-6">₹1,50,000+ PRIZE POOL</p>
-        <p class="text-sm font-bold tracking-widest uppercase mb-8">GDG ON CAMPUS LNCTS × GDG ON CAMPUS CRCE</p>
-        
-        <div class="flex justify-center gap-6 text-sm font-bold uppercase underline">
-            <a href="https://bitnbuild-lemon.vercel.app" class="hover:text-[var(--comic-cyan)] transition-colors">Official Website</a>
-            <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="hover:text-[var(--comic-cyan)] transition-colors">Registration</a>
-        </div>
-    </footer>
+  <!-- Sticky Mobile CTA -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black border-t-4 border-black p-3 flex justify-between items-center shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+    <div class="font-mono text-xs text-white uppercase font-bold tracking-widest leading-tight">
+      26–27 SEP<br><span class="text-emerald-400">₹1.5L+ PRIZE</span>
+    </div>
+    <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="bg-comic-yellow text-black font-headline text-sm px-6 py-2.5 comic-border shadow-brutal-sm focus:outline-none">
+      REGISTER
+    </a>
+  </div>
 
-    <script>
-        // STRICT TIMESTAMPS (UTC mapped to IST)
-        const START_TIME = Date.parse("2026-09-25T18:30:00Z"); // 26 Sep 00:00 IST
-        const END_TIME = Date.parse("2026-09-27T06:30:00Z");   // 27 Sep 12:00 IST
-        
-        // TEST OVERRIDE: Set to null for production. Set to 'PRE', 'ACTIVE', or 'CONCLUDED' to test visual states.
-        const TEST_OVERRIDE = null; 
+  <!-- Global Toast -->
+  <div id="toast" class="fixed -bottom-20 left-1/2 -translate-x-1/2 bg-black text-comic-yellow font-mono text-xs font-bold border-2 border-comic-yellow px-4 py-2 z-[9999] opacity-0 pointer-events-none">
+    Link Copied to Clipboard!
+  </div>
 
-        // STATE MANAGEMENT
-        // 0: PRE-RELEASE, 1: ACTIVE, 2: CONCLUDED
-        let currentState = -1; 
-        let initialLoad = true;
+  <script>
+    /* 1. Boot Sequence Logic */
+    document.addEventListener("DOMContentLoaded", () => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const bootOverlay = document.getElementById("boot-sequence");
+      
+      if(prefersReducedMotion) {
+        bootOverlay.style.display = 'none';
+        checkHashOnLoad();
+        return;
+      }
 
-        // SECURE MISSION PAYLOAD GATING
-        // The payload is heavily obfuscated (reversed strings) so it cannot be read from the source casually.
-        // It is strictly reconstructed only when the state is active/concluded.
-        const _rev = s => s.split('').reverse().join('');
-        const _rawPayload = {
-            "001": {
-                b: ".elbisseccani ro tneiciffeni ,detnemgarf niamer swolkrow yadyreve ynam tey ,yad yreve secivres latigid xelpmoc ylgnisaercni htiw tcaretni elpoeP",
-                c: ".ecivres ro noitcaretni ,wolkrow dlrow-laer a sevorpmi yllufgninaem taht noitulos desab-bew a dliuB",
-                d: ["noitaroballoC", "noitacudE", "ytilibisseccA", "ytivitcudorP", "secivres ytinummoc/cilbuP", "swolkrow repoleveD", "noitamotuA"],
-                g: ".noitacilppa yranidro esiwrehto na rof reyal noitatneserp a ylpmis ton — devlos si melborp eht woh ot lartnec eb dluohs bew ehT",
-                x: ".noitavonni yramirp eht sa esabatad a dna draobhsad a ,noitacitnehtua htiw noitacilppa DURC cisab a gnidliub diovA",
-                o: ".epytotorp nohtakcah a dnoyeb elacs dluoc noitulos ruoy woh tuoba knihT"
-            },
-            "002": {
-                b: ".tluciffid sniamer snoisiced lufesu otni noitamrofni taht gninrut tub ,elbaliava era noitamrofni fo stnuoma egraL",
-                c: ".yllaunam eldnah ot tluciffid eb esiwrehto dluow taht gnihtemos no tca ro dnemmocer ,yfissalc ,tciderp ,dnatsrednu elpoep spleh taht noitulos derewop-LM/IA na dliuB",
-                d: ["noitciderP", "noitadnemmoceR", "gnissecorp egaugnal larutaN", "noisiv retupmoC", "noitceted ylamonA", "stnega tnegilletnI", "troppus noisiceD", "noitazilanosreP"],
-                g: ".noitacilppa yranidro na ot dehcatta IPA ro tobtahc a gnieb ylpmis naht rehtar noitulos eht ot lufgninaem eb dluohs IA",
-                x: ".sah ti snoitatimil tahw dna dedeen si ti yhw ,seod tnenopmoc IA eht tahw nialpxe ot elba eB",
-                o: ".enola erawtfos lanoitnevnoc hguorht eveihca ot lacitcarpmi ro tluciffid eb dluow taht ytilibapac a etaerc ot IA esU"
-            },
-            "003": {
-                b: ".smetsys latigid ni spag dna secitcarp ytiruces roop ,noitacitnehtua kaew ,ruoivaheb namuh tiolpxe ylgnisaercni srekcatta ,enilno evom sevil ruo fo erom sA",
-                c: ".taerht ytirucesrebyc lufgninaem a ot dnopser ro ceted ,tneverp ,yfitnedi spleh taht noitulos a dliuB",
-                d: ["duarF", "gnihsihP", "ytitnedI", "noitacitnehtuA", "ycavirP", "noitceted taerhT", "ssenerawa ytiruceS", "yrevocsid ytilibarenluV"],
-                g: ".ylevitceffe erom dnopser ro noisiced ytiruces retteb a ekam enoemos spleh noitulos ruoy woh wohS .taerht a tceted ylpmis t'noD",
-                x: ".erutaef evitaroced a naht rehtar noitulos eroc eht fo trap eb dluohs ytiruceS",
-                o: ".noitulos ruoy ssapyb ot yrt thgim rekcatta na woh redisnoC"
-            },
-            "004": {
-                b: ".tsurt ro yticitnehtua ,ytitnedi ,pihsrenwo hsilbatse ot seitirohtua dezilartnec no ylivaeh dneped smetsys emoS",
-                c: ".egatnavda eniuneg a sedivorp ssenstseltsurt ro ycnerapsnart ,pihsrenwo elbafirev ,noitazilartneced erehw noitulos a dliuB",
-                d: ["ytitnedi latigiD", "slaitnederC", "pihsrenwO", "noitacifireV", "snoitcasnarT", "sniahc ylppuS", "stcartnoc tramS", "snoitacilppa dezilartneceD"],
-                g: ".pihsrenwo resu ro tsurt elbafirev ,noitazilartneced morf stifeneb taht melborp a evlos dluohs ygolonhcet ehT",
-                x: ".eb ot deen ton seod tahw dna dezilartneced eb dluohs tahw yfitsuj ylraelC",
-                o: ".niahc-no atad gnirots ylpmis dnoyeb knihT"
-            },
-            "005": {
-                b: ".wonk ot deen yllautca yeht tahw elpoep sllet ylerar noitamrofni war tub ,erehwyreve si ataD",
-                c: ".noisiced retteb a ekam enoemos pleh taht sthgisni otni atad gnignahc ylsuounitnoc ro detnemgarf ,xelpmoc nruT",
-                d: ["gnitsaceroF", "scitylanA", "noitceted ylamonA", "noitazilausiV", "noitadnemmoceR", "ecnegilletni ssenisuB", "gnikam noisiced emit-laeR", "smetsys evitciderP"],
-                g: ".ti morf lufesu gnihtemos tcartxE .atad yalpsid ylpmis t'noD",
-                x: ".emoctuo ro noisiced ,thgisni elbaoitca na otni atad mrofsnart dluohs noitulos ruoY",
-                o: ".emit laer ni atad wen ot dnopser dluoc metsys ruoy woh redisnoC"
-            },
-            "006": {
-                b: ".noitulos denifederp oN<br>.yrtsudni denifederp oN<br>.ygolonhcet denifederp oN",
-                c: ".tsixe ot sevresed ti taht su ecnivnoC .noitulos a dliuB .ti secneirepxe ohw dnatsrednU .gnivlos htrow melborp a dniF",
-                d: ["erachtlaeH", "etamilC", "ecnaniF", "erutlucirgA", "noitatropsnarT", "noitacudE", "ytilibisseccA", "ytivitcudorP", "sloot repoleveD", "tcapmi laicoS", "tnereffid yletelpmoc gnihtemos rO"],
-                g: ".noitatnemelpmi gnikrow a dna noitulos lufthguoht a ,melborp denifed ylraelc A",
-                x: ".ti sdeen enoemos esuaceb gnihtemos dliuB .nac uoy esuaceb tsuj gnihtemos dliub t'noD",
-                o: null
-            }
-        };
+      const t2 = document.getElementById("boot-text-2");
+      const t3 = document.getElementById("boot-text-3");
+      const t4 = document.getElementById("boot-text-4");
+      const progress = document.getElementById("boot-progress");
 
-        // SHARE FUNCTIONALITY
-        window.shareMission = function(missionId) {
-            const url = window.location.origin + window.location.pathname + "#mission-" + missionId;
-            navigator.clipboard.writeText(url).then(() => {
-                const toast = document.getElementById("toast");
-                toast.classList.add("show");
-                setTimeout(() => toast.classList.remove("show"), 3000);
-            });
-        };
+      setTimeout(() => { progress.style.width = '30%'; }, 100);
+      setTimeout(() => { t2.classList.remove('opacity-0'); progress.style.width = '60%'; }, 500);
+      setTimeout(() => { t3.classList.remove('opacity-0'); progress.style.width = '90%'; }, 1000);
+      setTimeout(() => { t4.classList.remove('opacity-0'); progress.style.width = '100%'; }, 1300);
+      
+      setTimeout(() => {
+        bootOverlay.classList.add('boot-hidden');
+        checkHashOnLoad();
+      }, 1600);
+    });
 
-        // TICKER & STATE CONTROLLER
-        function updateTick() {
-            const now = Date.now();
-            let newState = -1;
-
-            if (TEST_OVERRIDE === 'PRE') newState = 0;
-            else if (TEST_OVERRIDE === 'ACTIVE') newState = 1;
-            else if (TEST_OVERRIDE === 'CONCLUDED') newState = 2;
-            else {
-                if (now < START_TIME) newState = 0;
-                else if (now >= START_TIME && now < END_TIME) newState = 1;
-                else newState = 2;
-            }
-
-            if (currentState !== newState) {
-                transitionState(currentState, newState);
-                currentState = newState;
-            }
-
-            const timerElement = document.getElementById("countdown");
-            if (newState === 0) {
-                timerElement.innerHTML = formatTime(START_TIME - now);
-            } else if (newState === 1) {
-                timerElement.innerHTML = formatTime(END_TIME - now);
-            }
-            // State 2 handles text rendering in transitionState
+    /* 2. Anchor Hash Routing */
+    function checkHashOnLoad() {
+      const hash = window.location.hash;
+      if(hash && hash.startsWith('#mission-')) {
+        const targetMission = document.querySelector(hash);
+        if(targetMission) {
+          const btn = targetMission.querySelector('.toggle-file-btn');
+          if(btn && btn.getAttribute('aria-expanded') === 'false') {
+            btn.click();
+          }
+          targetMission.scrollIntoView({ behavior: 'smooth' });
         }
+      }
+    }
 
-        function formatTime(ms) {
-            if (ms < 0) ms = 0;
-            const h = Math.floor(ms / (1000 * 60 * 60));
-            const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((ms % (1000 * 60)) / 1000);
-            return String(h).padStart(2, '0') + " : " + String(m).padStart(2, '0') + " : " + String(s).padStart(2, '0');
+    /* 3. Dossier Toggles */
+    const toggleBtns = document.querySelectorAll('.toggle-file-btn');
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = this.getAttribute('aria-controls');
+        const content = document.getElementById(targetId);
+        const icon = this.querySelector('.toggle-icon');
+        const text = this.querySelector('.btn-text');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+        if(isExpanded) {
+          this.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          icon.textContent = '▼';
+          text.textContent = 'OPEN FILE';
+          this.classList.replace('bg-slate-800', 'bg-black');
+        } else {
+          this.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          icon.textContent = '▲';
+          text.textContent = 'SEAL FILE';
+          this.classList.replace('bg-black', 'bg-slate-800');
         }
+      });
+    });
 
-        function transitionState(oldState, newState) {
-            const updateUI = () => {
-                const heroStatus = document.getElementById("hero-status-text");
-                const statusIndicator = document.getElementById("status-indicator");
-                const statusText = document.getElementById("status-text");
-                const countdownLabel = document.getElementById("countdown-label");
-                const deadlineLabel = document.getElementById("deadline-label");
-                const timerElement = document.getElementById("countdown");
+    /* 4. Real-time persistent countdown logic */
+    // Start: 26 Sep 2026 12:00 AM IST (UTC: 25 Sep 18:30:00)
+    // End: 27 Sep 2026 12:00 PM IST (UTC: 27 Sep 06:30:00)
+    const startTimeUTC = new Date(Date.UTC(2026, 8, 25, 18, 30, 0)).getTime();
+    const endTimeUTC = new Date(Date.UTC(2026, 8, 27, 6, 30, 0)).getTime();
+    
+    const hEl = document.getElementById('hours');
+    const mEl = document.getElementById('minutes');
+    const sEl = document.getElementById('seconds');
+    const displayEl = document.getElementById('countdown-display');
+    const closedEl = document.getElementById('countdown-closed');
+    const statusIndicators = document.querySelectorAll('.mission-status');
+    const heroStatusText = document.getElementById('status-indicator');
 
-                if (newState === 0) { // PRE-RELEASE
-                    heroStatus.innerText = "ARE CLASSIFIED.";
-                    heroStatus.className = "text-gray-500";
-                    statusIndicator.className = "w-4 h-4 rounded-full bg-yellow-500 animate-pulse";
-                    statusText.innerText = "STANDBY";
-                    countdownLabel.innerText = "MISSION UNLOCK IN";
-                    deadlineLabel.innerText = "UNLOCK: 26 SEP 2026 · 12:00 AM IST";
-                } 
-                else if (newState === 1 || newState === 2) {
-                    heroStatus.innerText = "ARE OPEN.";
-                    heroStatus.className = "text-[var(--comic-red)]";
-                    
-                    if (newState === 1) { // ACTIVE
-                        statusIndicator.className = "w-4 h-4 rounded-full bg-green-500 animate-pulse";
-                        statusText.innerText = "ACTIVE";
-                        countdownLabel.innerText = "36-HOUR MISSION CLOCK";
-                        deadlineLabel.innerText = "DEADLINE: 27 SEPTEMBER · 12:00 PM IST";
-                    } else { // CONCLUDED
-                        statusIndicator.className = "w-4 h-4 rounded-full bg-red-500";
-                        statusText.innerText = "CONCLUDED";
-                        countdownLabel.innerText = "STATUS";
-                        deadlineLabel.innerText = "SUBMISSIONS ARE NOW CLOSED";
-                        timerElement.innerHTML = "BUILD WINDOW CLOSED";
-                        timerElement.classList.replace("text-5xl", "text-3xl");
-                        timerElement.classList.replace("md:text-7xl", "md:text-5xl");
-                        timerElement.classList.add("text-[var(--comic-red)]");
-                    }
-                    
-                    // Decrypt and Inject HTML payload
-                    renderMissions(newState);
-                    
-                    // Route hash links once DOM is populated
-                    if(window.location.hash) {
-                        const missionEl = document.querySelector(window.location.hash);
-                        if(missionEl && missionEl.tagName === 'DETAILS') {
-                            missionEl.open = true;
-                            if (!initialLoad) setTimeout(() => missionEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-                        }
-                    }
-                }
-            };
+    function updateClock() {
+      const now = new Date().getTime();
 
-            // Trigger visual boot sequence ONLY if crossing midnight while tab is open, or testing.
-            if ((initialLoad && newState === 1) || (oldState === 0 && newState === 1)) {
-                const bootScreen = document.getElementById('boot-sequence');
-                const bootText = document.getElementById('boot-text');
-                
-                if (window.matchMedia(`(prefers-reduced-motion: reduce)`).matches) {
-                    updateUI();
-                } else {
-                    bootScreen.style.display = 'flex';
-                    bootScreen.style.opacity = '1';
-                    bootText.innerText = "CLASSIFIED FILE SYSTEM";
-                    bootText.classList.remove("text-green-500");
+      if (now < startTimeUTC) {
+        // Pre-event: cap at 36:00:00
+        hEl.textContent = '36';
+        mEl.textContent = '00';
+        sEl.textContent = '00';
+        heroStatusText.textContent = "MISSION STATUS: STANDBY";
+        return;
+      }
 
-                    setTimeout(() => { bootText.innerText = "AUTHENTICATING..."; }, 500);
-                    setTimeout(() => { bootText.innerText = "ACCESS GRANTED"; bootText.classList.add("text-green-500"); }, 1000);
-                    setTimeout(() => { 
-                        bootText.innerText = "MISSION FILES UNLOCKED"; 
-                        updateUI(); // Inject DOM here behind the splash screen
-                        setTimeout(() => {
-                            bootScreen.style.transition = 'opacity 0.3s ease-out';
-                            bootScreen.style.opacity = '0';
-                            setTimeout(() => bootScreen.style.display = 'none', 300);
-                        }, 600);
-                    }, 1500);
-                }
-            } else {
-                updateUI();
-            }
-            initialLoad = false;
-        }
+      if (now >= endTimeUTC) {
+        // Post-event
+        displayEl.classList.add('hidden');
+        closedEl.classList.remove('hidden');
+        heroStatusText.textContent = "MISSION STATUS: CONCLUDED";
+        statusIndicators.forEach(el => {
+          el.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span>SUBMISSIONS CLOSED`;
+          el.classList.replace('border-black', 'border-red-500');
+          el.classList.add('text-red-700');
+        });
+        return;
+      }
 
-        function renderMissions(state) {
-            const keys = ["001", "002", "003", "004", "005", "006"];
-            const badgeHTML = state === 2 
-                ? `<span class="border-2 border-red-500 text-red-700 font-bold px-3 py-1 text-sm bg-red-100 rounded-full">● SUBMISSIONS CLOSED</span>`
-                : `<span class="border-2 border-green-500 text-green-700 font-bold px-3 py-1 text-sm bg-green-100 rounded-full animate-pulse">● UNLOCKED</span>`;
+      // Active event
+      const diff = endTimeUTC - now;
+      const totalSeconds = Math.floor(diff / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
 
-            keys.forEach(k => {
-                const el = document.getElementById(`mission-${k}`);
-                const meta = document.getElementById(`mission-meta-${k}`);
-                const content = document.getElementById(`mission-content-${k}`);
-                const payload = _rawPayload[k];
+      hEl.textContent = String(h).padStart(2, '0');
+      mEl.textContent = String(m).padStart(2, '0');
+      sEl.textContent = String(s).padStart(2, '0');
+      heroStatusText.textContent = "MISSION STATUS: ACTIVE";
+    }
 
-                el.classList.remove("pointer-events-none");
-                
-                meta.innerHTML = `
-                    ${badgeHTML}
-                    <span class="font-bold underline group-open:hidden mt-2 text-black hover:text-[var(--comic-red)]">[ OPEN FILE ]</span>
-                    <span class="font-bold underline hidden group-open:block mt-2 text-black hover:text-[var(--comic-red)]">[ CLOSE FILE ]</span>
-                `;
+    setInterval(updateClock, 1000);
+    updateClock();
 
-                let dirsHTML = payload.d.map(item => `<li>${_rev(item)}</li>`).join('');
-                
-                let bonusHTML = payload.o ? `
-                    <div>
-                        <h4 class="font-bold text-gray-500 uppercase text-sm mb-1">OPTIONAL BONUS</h4>
-                        <p>${_rev(payload.o)}</p>
-                    </div>
-                ` : '';
-                
-                let constraintHTML = payload.x ? `
-                    <div class="bg-gray-100 p-4 border-l-8 border-[var(--comic-red)]">
-                        <h4 class="font-bold text-gray-500 uppercase text-sm mb-1">${k === '006' ? 'THE ONLY RULE' : 'CONSTRAINT'}</h4>
-                        <p class="font-bold">${_rev(payload.x)}</p>
-                    </div>
-                ` : '';
+    /* 5. Sharing Functions */
+    function showToast() {
+      const t = document.getElementById('toast');
+      t.style.bottom = '100px';
+      t.style.opacity = '1';
+      setTimeout(() => {
+        t.style.bottom = '-80px';
+        t.style.opacity = '0';
+      }, 3000);
+    }
 
-                let goodExtra = k === '004' ? `<p class="font-bold text-sm text-[var(--comic-red)] mt-2 uppercase">IMPORTANT: If blockchain does not meaningfully improve your solution, don't use blockchain.</p>` : '';
+    window.copyLink = function(id) {
+      const url = window.location.origin + window.location.pathname + '#' + id;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(showToast).catch(err => {
+          // fallback
+          const input = document.createElement('input');
+          input.value = url;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          document.body.removeChild(input);
+          showToast();
+        });
+      }
+    };
 
-                let goodBg = "bg-[var(--comic-yellow)]";
-                if(k==='002') goodBg = "bg-[var(--comic-cyan)]";
-                if(k==='003') goodBg = "bg-red-100";
-                if(k==='004') goodBg = "bg-purple-100";
-                if(k==='005') goodBg = "bg-green-100";
-                if(k==='006') goodBg = "bg-gray-200";
-
-                content.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-gray-500 uppercase text-sm mb-1">MISSION BRIEF</h4>
-                        <p class="text-lg ${k === '006' ? 'font-bold' : ''}">${_rev(payload.b)}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-500 uppercase text-sm mb-1">THE CHALLENGE</h4>
-                        <p class="text-lg font-bold">${_rev(payload.c)}</p>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-bold text-gray-500 uppercase text-sm mb-2">DIRECTIONS TO EXPLORE</h4>
-                            <ul class="list-disc list-inside space-y-1 font-semibold">
-                                ${dirsHTML}
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-500 uppercase text-sm mb-2">WHAT GOOD LOOKS LIKE</h4>
-                            <p class="font-semibold ${goodBg} p-3 border-2 border-black">${_rev(payload.g)}</p>
-                            ${goodExtra}
-                        </div>
-                    </div>
-                    ${constraintHTML}
-                    ${bonusHTML}
-                    <div class="mt-4 border-t-2 border-dashed border-gray-300 pt-4 text-right">
-                        <button onclick="shareMission('${k}')" class="text-sm font-bold bg-black text-white px-4 py-2 hover:bg-[var(--comic-cyan)] hover:text-black transition-colors border-2 border-black">
-                            SHARE MISSION
-                        </button>
-                    </div>
-                `;
-            });
-        }
-
-        setInterval(updateTick, 1000);
-        updateTick();
-    </script>
+    window.shareWA = function(id, title) {
+      const url = window.location.origin + window.location.pathname + '#' + id;
+      const text = `Bit N Build Mission Unlocked: ${title} — ${url}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    };
+  </script>
 </body>
 </html>
