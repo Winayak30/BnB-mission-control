@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIT N BUILD 2026 // MISSION CONTROL — MP ROUND</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Archivo+Black&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            comic: {
+              yellow: '#FFDE59',
+              cyan: '#00F0FF',
+              red: '#FF3366',
+              dark: '#0C0D11',
+              card: '#161822',
+              cream: '#F7F4EA',
+              folder: '#EEDB9E',
+              folderDark: '#D4BE77',
+            }
+          },
+          fontFamily: {
+            comic: ['Bangers', 'cursive'],
+            headline: ['"Archivo Black"', 'sans-serif'],
+            body: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'brutal-sm': '3px 3px 0px #000000',
+            'brutal': '6px 6px 0px #000000',
+            'brutal-lg': '10px 10px 0px #000000',
+            'brutal-xl': '14px 14px 0px #000000',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Halftone and Textures */
+    .halftone-bg {
+      background-color: #0c0d11;
+      background-image: radial-gradient(#26283b 15%, transparent 16%), radial-gradient(#1f2130 15%, transparent 16%);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+    .comic-border { border: 3.5px solid #000000; }
+    .comic-border-thick { border: 5px solid #000000; }
+
+    /* Boot Sequence */
+    #boot-sequence {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .boot-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Stamps & Animations */
+    .stamp-badge {
+      text-transform: uppercase;
+      font-family: 'Bangers', cursive;
+      letter-spacing: 0.12em;
+      border-width: 3.5px;
+      border-style: dashed;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-3.5deg);
+    }
+
+    .comic-btn {
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .comic-btn:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 9px 9px 0px #000;
+      }
+      .comic-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 2px 2px 0px #000;
+      }
+    }
+
+    /* Dossier transitions */
+    .mission-details-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease-out;
+    }
+    .mission-details-wrapper.is-open {
+      grid-template-rows: 1fr;
+    }
+    .mission-details-inner {
+      overflow: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0c0d11; border-left: 2px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #FFDE59; border: 2px solid #000; }
+    ::-webkit-scrollbar-thumb:hover { background: #00F0FF; }
+
+    /* Toast Notification */
+    #toast {
+      transition: bottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+    
+    /* Target offsets for anchor links */
+    :target { scroll-margin-top: 100px; }
+    :target > div { animation: highlight-pulse 2s ease-out; }
+    @keyframes highlight-pulse {
+      0%, 100% { box-shadow: 10px 10px 0px #000000; }
+      50% { box-shadow: 0px 0px 0px #FFDE59, 0 0 0 6px #FFDE59; }
+    }
+  </style>
+</head>
+<body class="halftone-bg text-slate-100 font-body antialiased min-h-screen selection:bg-comic-yellow selection:text-black pb-16 md:pb-0">
+
+  <!-- 1. Boot Sequence Overlay -->
+  <div id="boot-sequence" class="fixed inset-0 z-[9999] bg-black text-emerald-400 font-mono flex flex-col justify-center items-center p-4">
+    <div class="max-w-md w-full border border-emerald-400/30 p-6 shadow-[0_0_20px_rgba(52,211,153,0.1)]">
+      <div id="boot-text-1" class="text-sm sm:text-lg mb-2">> CLASSIFIED FILE SYSTEM</div>
+      <div id="boot-text-2" class="text-sm sm:text-lg mb-2 opacity-0">> AUTHENTICATING...</div>
+      <div id="boot-text-3" class="text-sm sm:text-lg mb-2 opacity-0">> ACCESS GRANTED</div>
+      <div id="boot-text-4" class="text-sm sm:text-lg text-comic-yellow font-bold mt-4 opacity-0 animate-pulse">> MISSION FILES UNLOCKED</div>
+      <div class="mt-4 h-1 w-full bg-emerald-900/30 overflow-hidden">
+        <div id="boot-progress" class="h-full bg-emerald-400 w-0 transition-all ease-linear"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-comic-dark/95 backdrop-blur-md border-b-4 border-black px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="https://bitnbuild-lemon.vercel.app" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-comic-yellow">
+        <div class="w-10 h-10 bg-comic-yellow comic-border flex items-center justify-center shadow-brutal-sm font-comic text-2xl text-black group-hover:bg-comic-cyan transition-colors">B&B</div>
+        <div class="leading-tight">
+          <div class="font-headline tracking-tighter text-base sm:text-lg flex items-center gap-2">
+            BIT N BUILD 2026
+            <span class="hidden sm:inline-flex items-center gap-1.5 bg-comic-red/20 text-comic-red border border-comic-red px-2 py-0.5 rounded text-[11px] font-mono uppercase">MP ROUND</span>
+          </div>
+        </div>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 font-headline text-sm tracking-wide">
+        <a href="#missions" class="hover:text-comic-yellow transition-colors"><span class="text-comic-yellow">#</span> MISSION FILES</a>
+        <a href="#criteria" class="hover:text-comic-yellow transition-colors"><span class="text-comic-cyan">#</span> JUDGING</a>
+        <a href="#ai-rules" class="hover:text-comic-yellow transition-colors"><span class="text-comic-red">#</span> AI RULES</a>
+        <a href="#timeline" class="hover:text-comic-yellow transition-colors"><span class="text-slate-400">#</span> PROTOCOL</a>
+      </nav>
+      <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="hidden md:flex comic-btn bg-comic-yellow text-black font-headline text-sm px-5 py-2.5 comic-border shadow-brutal items-center gap-2 focus:outline-none focus:ring-4 focus:ring-comic-cyan">
+        REGISTER
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="relative pt-8 pb-10 px-4 overflow-hidden border-b-4 border-black">
+      <div class="max-w-6xl mx-auto relative z-10">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="inline-flex items-center gap-2 bg-comic-card comic-border px-3.5 py-1.5 shadow-brutal-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-comic-yellow"></span>
+            <span class="font-mono text-xs font-bold text-slate-300 uppercase tracking-wider">
+              CLEARANCE: <span class="text-comic-yellow">UNLOCKED</span> // MP SECTOR
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-comic-card comic-border p-6 sm:p-10 shadow-brutal-lg relative mb-6">
+          <div class="inline-block mb-3">
+            <p class="font-mono text-xs sm:text-sm font-bold text-comic-cyan uppercase tracking-widest flex items-center gap-2">
+              <span class="text-comic-red">►►</span> BIT N BUILD 2026 // MP ROUND
+            </p>
+          </div>
+
+          <h1 class="font-comic text-5xl sm:text-7xl lg:text-8xl tracking-wider text-comic-yellow leading-none mb-3 drop-shadow-[4px_4px_0px_#000]">
+            THE MISSION FILES <br><span class="text-white">ARE OPEN.</span>
+          </h1>
+          <p class="font-headline text-lg sm:text-2xl text-slate-200 tracking-tight max-w-2xl mb-8">
+            6 MISSIONS · 36 HOURS · ONE CHALLENGE
+          </p>
+
+          <!-- Countdown UI -->
+          <div class="bg-black/80 comic-border p-4 sm:p-6 shadow-brutal mb-8 max-w-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 bg-comic-red rounded-full animate-ping"></span>
+                <span id="status-indicator" class="font-mono text-xs uppercase tracking-wider text-slate-400 font-bold">MISSION STATUS: ACTIVE</span>
+              </div>
+              <div class="font-mono text-xs text-comic-cyan font-bold">DEADLINE: 27 SEP · 12:00 PM IST</div>
+            </div>
+
+            <div id="countdown-display" class="grid grid-cols-3 gap-3 sm:gap-6 text-center">
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="hours" class="font-comic text-4xl sm:text-6xl text-comic-yellow tracking-wider">36</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">HOURS</div>
+              </div>
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="minutes" class="font-comic text-4xl sm:text-6xl text-comic-cyan tracking-wider">00</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">MINUTES</div>
+              </div>
+              <div class="bg-comic-card comic-border p-3 sm:p-4 shadow-brutal-sm">
+                <div id="seconds" class="font-comic text-4xl sm:text-6xl text-comic-red tracking-wider">00</div>
+                <div class="font-mono text-[10px] sm:text-xs text-slate-400 font-bold mt-1 tracking-widest">SECONDS</div>
+              </div>
+            </div>
+            <div id="countdown-closed" class="hidden text-center py-6 bg-comic-red comic-border shadow-brutal-sm">
+              <span class="font-comic text-4xl sm:text-5xl text-white tracking-widest">BUILD WINDOW CLOSED</span>
+            </div>
+          </div>
+
+          <a href="#missions" class="comic-btn inline-flex bg-comic-yellow text-black font-headline text-base px-7 py-3.5 comic-border shadow-brutal items-center gap-3 focus:outline-none">
+            <span>ENTER MISSION CONTROL</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"/></svg>
+          </a>
+        </div>
+
+        <!-- Mission Intel Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mt-6">
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-white">36 HOURS</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-comic-cyan">2–4 MEMBERS</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center col-span-2 md:col-span-1">
+            <span class="font-headline text-xl text-comic-yellow">AI ALLOWED</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-emerald-400">₹1,50K+ PRIZES</span>
+          </div>
+          <div class="bg-comic-card comic-border p-3 text-center shadow-brutal-sm flex flex-col justify-center">
+            <span class="font-headline text-xl text-comic-red text-sm sm:text-base">ONLINE · MP</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission Files Section -->
+    <section id="missions" class="py-16 px-4 max-w-7xl mx-auto">
+      <div class="mb-10 flex flex-col border-b-4 border-black pb-6">
+        <h2 class="font-comic text-5xl sm:text-7xl text-white tracking-wider drop-shadow-[3px_3px_0px_#000]">THE MISSION FILES</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- MISSION 001 -->
+        <article id="mission-001" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 001</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-yellow px-2 py-0.5 self-start mb-3 border border-black">WEB DEVELOPMENT</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">BUILD THE FUTURE</h3>
+            
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-1">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">The modern web is cluttered with tools that optimize minor inconveniences while ignoring foundational systemic issues in public utility, accessibility, and community infrastructure.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a highly useful web-based solution targeted at a specific, underserved user group. Move beyond basic CRUD logic to deliver genuine real-world utility.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Productivity</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Accessibility</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Public Services</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Dev Tools</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Automation</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-red">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-red mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The core value of your application must not rely on the user manually entering massive amounts of data just to get started.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">An intuitive interface where a target user immediately grasps the utility. Smooth state management and resilience.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-001')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border hover:bg-slate-800 focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-001', 'BUILD THE FUTURE')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold hover:bg-[#1EBE5D] focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-yellow font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-black/20" aria-controls="mission-details-1">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 002 -->
+        <article id="mission-002" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 002</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-cyan px-2 py-0.5 self-start mb-3 border border-black">AI / MACHINE LEARNING</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">TEACH THE MACHINE</h3>
+            
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-2">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">AI has moved past party tricks. The next wave of intelligent software requires models that assist human judgment, automate complex reasoning, or process unstructured chaos into structured insight.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a system where artificial intelligence solves a meaningful problem rather than simply being pasted in as a cosmetic chat feature.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Prediction</span>
+                    <span class="bg-white comic-border px-2 py-0.5">NLP workflows</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Computer Vision</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Autonomous Agents</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-cyan">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-cyan mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The AI must be in the critical path of the application. If you remove the AI component, the application should fail to fulfill its primary purpose.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Proper prompt engineering, edge-case handling (what happens when the AI hallucinates?), and an architecture that gracefully integrates inference.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-002')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-002', 'TEACH THE MACHINE')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-cyan font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-black/20" aria-controls="mission-details-2">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 003 -->
+        <article id="mission-003" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 003</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-comic-red px-2 py-0.5 self-start mb-3 border border-black">CYBERSECURITY</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">BREAK THE SYSTEM</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-3">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">As digital ecosystems expand, the attack surface grows exponentially. Relying solely on enterprise firewalls is no longer enough; security must be accessible and systemic.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a defense mechanism, educational simulator, or monitoring tool that helps organizations or individuals understand, prevent, or mitigate digital threats.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Phishing Defense</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Zero-Knowledge Auth</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Fraud Mitigation</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-comic-red">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-comic-red mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The solution must include a frontend interface that successfully explains the threat or defense action to a non-technical end user.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Practical implementation of cryptography, secure state handling, and a working demonstration of a mitigated vulnerability.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-003')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-003', 'BREAK THE SYSTEM')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-comic-red font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-3">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 004 -->
+        <article id="mission-004" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 004</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-white px-2 py-0.5 self-start mb-3 border border-black">BLOCKCHAIN / DECENTRALIZATION</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">TRUST WITHOUT PERMISSION</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-4">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">True decentralized engineering solves issues of verifiable trust, ownership, and censorship-resistance that centralized databases cannot handle natively.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Build a blockchain application or smart contract system that establishes verifiable trust or facilitates unmediated peer interactions.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Digital Identity</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Supply Chain Auth</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Verifiable Credentials</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-slate-800">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-slate-800 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">You must be able to clearly justify why a standard Postgres/MongoDB database could not solve this problem just as well.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Clean smart contract logic, secure handling of wallets/transactions, and an interface that abstracts Web3 complexity from the user.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-004')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-004', 'TRUST WITHOUT PERMISSION')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-white font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-4">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 005 -->
+        <article id="mission-005" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 005</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-purple-400 px-2 py-0.5 self-start mb-3 border border-black">DATA + AI</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">DATA HAS A STORY</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-5">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">We are drowning in raw data feeds but starving for actionable insight. Complex datasets are useless if they cannot be interpreted by decision-makers.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Turn raw data streams into compelling, interactive visual artifacts or dashboards that drive better, faster choices.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Real-time Analytics</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Predictive Forecasting</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Interactive Visualization</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-purple-500">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-purple-700 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The final output must recommend or facilitate an actionable decision, not just present a passive chart.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">High-performance rendering of datasets, clear visual hierarchy, and an architecture capable of processing incoming data states.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-005')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-005', 'DATA HAS A STORY')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-purple-400 font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-5">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- MISSION 006 -->
+        <article id="mission-006" class="bg-comic-folder text-black comic-border shadow-brutal-lg flex flex-col scroll-mt-24">
+          <div class="bg-comic-folderDark border-b-3 border-black p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs font-black tracking-widest text-black/80">MISSION FILE // 006</span>
+            <div class="flex gap-2">
+              <span class="mission-status font-mono text-[10px] font-bold border border-black px-2 py-0.5 bg-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>UNLOCKED</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col">
+            <span class="font-mono text-xs font-black bg-black text-emerald-400 px-2 py-0.5 self-start mb-3 border border-black">OPEN DOMAIN</span>
+            <h3 class="font-headline text-3xl text-black leading-tight mb-4">OPEN MISSION</h3>
+            <div class="mission-details-wrapper" aria-expanded="false" id="mission-details-6">
+              <div class="mission-details-inner space-y-5 text-sm pb-6">
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">MISSION BRIEF</h4>
+                  <p class="text-slate-800 font-medium">Innovation doesn't fit into neat predefined boxes. Some of the best engineering solutions solve niche, deeply personal, or radically ambitious problems.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">THE CHALLENGE</h4>
+                  <p class="text-slate-800 font-medium">Find a pressing problem in the world, define the constraints yourself, and build a meaningful technological solution using whatever stack serves it best.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">DIRECTIONS TO EXPLORE</h4>
+                  <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span class="bg-white comic-border px-2 py-0.5">Healthcare</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Climate/Agritech</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Social Impact</span>
+                    <span class="bg-white comic-border px-2 py-0.5">Fintech</span>
+                  </div>
+                </div>
+                <div class="bg-black/5 p-3 border-l-4 border-emerald-500">
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-emerald-700 mb-1">CONSTRAINT</h4>
+                  <p class="text-slate-900 font-bold text-xs">The problem must be a real, verifiable issue affecting actual people, not a contrived inconvenience invented just to use a specific framework.</p>
+                </div>
+                <div>
+                  <h4 class="font-headline text-xs uppercase tracking-wider text-black mb-1">WHAT GOOD LOOKS LIKE</h4>
+                  <p class="text-slate-800 font-medium text-xs">Deep domain understanding, empathy for the end user, and an architecture that matches the scale of the problem being solved.</p>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-2">
+                  <button onclick="copyLink('mission-006')" class="font-mono text-[10px] bg-black text-white px-3 py-1.5 comic-border focus:outline-none">Copy Link</button>
+                  <button onclick="shareWA('mission-006', 'OPEN MISSION')" class="font-mono text-[10px] bg-[#25D366] text-black px-3 py-1.5 comic-border font-bold focus:outline-none">WhatsApp Share</button>
+                </div>
+              </div>
+            </div>
+            <button class="toggle-file-btn mt-auto w-full bg-black text-emerald-400 font-headline text-sm py-3 comic-border flex items-center justify-center gap-2 focus:outline-none" aria-controls="mission-details-6">
+              <span class="btn-text">OPEN FILE</span> <span class="font-mono text-xs toggle-icon">▼</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Anti-CRUD & AI Doctrine -->
+    <section id="ai-rules" class="py-12 px-4 max-w-6xl mx-auto">
+      
+      <!-- Anti-CRUD -->
+      <div class="bg-comic-red text-white comic-border-thick p-6 sm:p-10 shadow-brutal-xl mb-12 text-center transform -rotate-1">
+        <h3 class="font-comic text-4xl sm:text-6xl tracking-widest mb-4">DON'T BUILD ANOTHER CRUD APP.</h3>
+        <p class="font-headline text-lg sm:text-2xl text-white/90 max-w-3xl mx-auto mb-6 leading-snug">
+          A login page + a dashboard + a database isn't innovation by itself. Use the 36 hours to create something that actually solves a meaningful problem.
+        </p>
+        <div class="inline-block bg-black text-comic-yellow font-comic text-3xl px-6 py-2 comic-border shadow-[4px_4px_0px_#fff]">
+          SHOW US SOMETHING REAL.
+        </div>
+      </div>
+
+      <!-- AI Rules -->
+      <div class="bg-comic-card comic-border-thick p-6 sm:p-12 shadow-brutal-xl">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+          <div class="flex-1">
+            <div class="bg-comic-yellow text-black font-comic text-2xl sm:text-4xl p-4 comic-border shadow-brutal inline-block mb-6 relative">
+              CAN I USE CLAUDE?
+              <div class="absolute -bottom-4 left-8 border-[12px] border-transparent border-t-comic-yellow w-0 h-0"></div>
+            </div>
+            <div class="font-comic text-7xl sm:text-9xl text-comic-cyan drop-shadow-[5px_5px_0px_#000] tracking-wider leading-none mb-6">YES.</div>
+            <div class="flex flex-wrap gap-2 text-slate-300 font-mono text-xs sm:text-sm">
+              <span class="bg-white/10 px-3 py-1 comic-border">Claude Code</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">ChatGPT</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Gemini</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Cursor</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">GitHub Copilot</span>
+              <span class="bg-white/10 px-3 py-1 comic-border">Other AI dev tools</span>
+            </div>
+          </div>
+          
+          <div class="flex-1 bg-black p-6 sm:p-8 comic-border border-white/20">
+            <h4 class="font-headline text-2xl text-white mb-4">AI IS A TOOL.<br>NOT YOUR TEAM.</h4>
+            <p class="font-body text-slate-300 mb-6 text-sm">
+              AI-native development is highly encouraged. However, your team must be able to strictly adhere to the following when the clock stops:
+            </p>
+            <ul class="space-y-3 font-comic text-2xl tracking-widest text-comic-yellow">
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-yellow rounded-full"></span> EXPLAIN IT.</li>
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-cyan rounded-full"></span> DEMO IT.</li>
+              <li class="flex items-center gap-3"><span class="w-3 h-3 bg-comic-red rounded-full"></span> DEFEND IT.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Judging Criteria -->
+    <section id="criteria" class="py-16 px-4 max-w-7xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h2 class="font-comic text-5xl sm:text-6xl text-white tracking-wider">JUDGING PILLARS</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">01</span>
+          <h3 class="font-comic text-3xl text-comic-cyan mb-2">PROBLEM</h3>
+          <p class="text-sm text-slate-300 font-body">Is it actually worth solving? Real pain points beat theoretical inconveniences.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">02</span>
+          <h3 class="font-comic text-3xl text-comic-cyan mb-2">INGENUITY</h3>
+          <p class="text-sm text-slate-300 font-body">Is your approach interesting? Clever architectures and original UX paradigms stand out.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">03</span>
+          <h3 class="font-comic text-3xl text-comic-yellow mb-2">TECHNOLOGY</h3>
+          <p class="text-sm text-slate-300 font-body">Did you choose the right tools? Purposeful tech selection over gratuitous complexity.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">04</span>
+          <h3 class="font-comic text-3xl text-emerald-400 mb-2">EXECUTION</h3>
+          <p class="text-sm text-slate-300 font-body">Does it actually work? A functional interactive path beats an elaborate theoretical pitch deck.</p>
+        </div>
+        <div class="bg-comic-card comic-border p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-slate-400 mb-1">05</span>
+          <h3 class="font-comic text-3xl text-purple-400 mb-2">IMPACT</h3>
+          <p class="text-sm text-slate-300 font-body">Could it matter beyond the hackathon? Solutions that have genuine longevity.</p>
+        </div>
+        <div class="bg-comic-yellow text-black comic-border-thick p-6 shadow-brutal flex flex-col">
+          <span class="font-mono text-xs font-black text-black/60 mb-1">06 // MANDATORY CRITICAL</span>
+          <h3 class="font-comic text-3xl mb-2">OWNERSHIP</h3>
+          <p class="text-sm font-bold font-body">Can your team explain and defend what you built? Knowing your own architecture is strictly required.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 36-Hour Protocol & Submission -->
+    <section id="timeline" class="py-16 px-4 bg-comic-dark/60 border-y-4 border-black">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="font-comic text-4xl sm:text-5xl text-center text-white tracking-wider mb-12">36-HOUR PROTOCOL</h2>
+        
+        <!-- Timeline Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-7 gap-3 mb-16 text-center">
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-comic-cyan mb-1">00:00</div>
+            <div class="font-headline text-xs sm:text-sm text-white">UNLOCK</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 1</div>
+            <div class="font-headline text-xs sm:text-sm text-white">UNDERSTAND</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 2</div>
+            <div class="font-headline text-xs sm:text-sm text-white">PROTOTYPE</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 3</div>
+            <div class="font-headline text-xs sm:text-sm text-white">BUILD</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 4</div>
+            <div class="font-headline text-xs sm:text-sm text-white">TEST</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm">
+            <div class="font-mono text-[10px] text-slate-400 mb-1">PHASE 5</div>
+            <div class="font-headline text-xs sm:text-sm text-white">POLISH</div>
+          </div>
+          <div class="bg-black comic-border p-3 shadow-brutal-sm col-span-2 md:col-span-1">
+            <div class="font-mono text-[10px] text-comic-red mb-1">36:00</div>
+            <div class="font-headline text-xs sm:text-sm text-white">SHIP</div>
+          </div>
+        </div>
+
+        <!-- Submission Rules -->
+        <div class="bg-comic-card comic-border p-8 shadow-brutal-lg max-w-4xl mx-auto">
+          <h3 class="font-comic text-4xl text-comic-yellow mb-6">WHEN THE CLOCK HITS ZERO</h3>
+          <p class="font-body text-slate-300 text-sm mb-6">Teams should be prepared to directly demonstrate the following during evaluation:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 font-mono text-xs text-slate-300">
+            <div><span class="text-white font-bold">01 — THE PROBLEM:</span> What did you identify?</div>
+            <div><span class="text-white font-bold">02 — YOUR SOLUTION:</span> What did you build?</div>
+            <div><span class="text-white font-bold">03 — WORKING PRODUCT:</span> Show the actual product.</div>
+            <div><span class="text-white font-bold">04 — TECHNOLOGY:</span> What did you use and why?</div>
+            <div><span class="text-white font-bold">05 — IMPACT:</span> Why does this matter?</div>
+            <div><span class="text-white font-bold">06 — OWNERSHIP:</span> Can you explain it?</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-20 px-4 max-w-4xl mx-auto text-center">
+      <div class="bg-comic-dark comic-border-thick p-8 sm:p-14 shadow-brutal-xl">
+        <h2 class="font-comic text-5xl sm:text-7xl lg:text-8xl text-white tracking-wider leading-none mb-4 drop-shadow-[4px_4px_0px_#000]">
+          THE CLOCK IS RUNNING.
+        </h2>
+        <p class="font-headline text-xl sm:text-3xl text-comic-yellow tracking-tight mb-8">
+          36 HOURS. 6 MISSIONS. ONE SHOT.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto comic-btn bg-comic-yellow text-black font-headline text-lg px-8 py-4 comic-border shadow-brutal font-black flex justify-center items-center gap-2">
+            ENTER THE CHALLENGE
+          </a>
+          <a href="https://bitnbuild-lemon.vercel.app" class="w-full sm:w-auto comic-btn bg-slate-800 text-white font-headline text-sm px-6 py-4 comic-border shadow-brutal flex justify-center items-center hover:bg-slate-700">
+            BACK TO BIT N BUILD
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t-4 border-black bg-comic-card py-10 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <div>
+        <div class="font-headline text-base text-white">BIT N BUILD 2026 // MP ROUND</div>
+        <p class="font-mono text-xs text-slate-400 mt-1">26–27 SEPTEMBER 2026</p>
+        <p class="font-mono text-[10px] text-slate-500 mt-1">GDG ON CAMPUS LNCTS × GDG ON CAMPUS CRCE</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4 font-mono text-xs text-comic-yellow">
+        <a href="https://bitnbuild-lemon.vercel.app" class="hover:underline">Official Website</a>
+        <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" class="hover:underline text-comic-cyan">Registration</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky Mobile CTA -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black border-t-4 border-black p-3 flex justify-between items-center shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+    <div class="font-mono text-xs text-white uppercase font-bold tracking-widest leading-tight">
+      26–27 SEP<br><span class="text-emerald-400">₹1.5L+ PRIZE</span>
+    </div>
+    <a href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581" target="_blank" rel="noopener noreferrer" class="bg-comic-yellow text-black font-headline text-sm px-6 py-2.5 comic-border shadow-brutal-sm focus:outline-none">
+      REGISTER
+    </a>
+  </div>
+
+  <!-- Global Toast -->
+  <div id="toast" class="fixed -bottom-20 left-1/2 -translate-x-1/2 bg-black text-comic-yellow font-mono text-xs font-bold border-2 border-comic-yellow px-4 py-2 z-[9999] opacity-0 pointer-events-none">
+    Link Copied to Clipboard!
+  </div>
+
+  <script>
+    /* 1. Boot Sequence Logic */
+    document.addEventListener("DOMContentLoaded", () => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const bootOverlay = document.getElementById("boot-sequence");
+      
+      if(prefersReducedMotion) {
+        bootOverlay.style.display = 'none';
+        checkHashOnLoad();
+        return;
+      }
+
+      const t2 = document.getElementById("boot-text-2");
+      const t3 = document.getElementById("boot-text-3");
+      const t4 = document.getElementById("boot-text-4");
+      const progress = document.getElementById("boot-progress");
+
+      setTimeout(() => { progress.style.width = '30%'; }, 100);
+      setTimeout(() => { t2.classList.remove('opacity-0'); progress.style.width = '60%'; }, 500);
+      setTimeout(() => { t3.classList.remove('opacity-0'); progress.style.width = '90%'; }, 1000);
+      setTimeout(() => { t4.classList.remove('opacity-0'); progress.style.width = '100%'; }, 1300);
+      
+      setTimeout(() => {
+        bootOverlay.classList.add('boot-hidden');
+        checkHashOnLoad();
+      }, 1600);
+    });
+
+    /* 2. Anchor Hash Routing */
+    function checkHashOnLoad() {
+      const hash = window.location.hash;
+      if(hash && hash.startsWith('#mission-')) {
+        const targetMission = document.querySelector(hash);
+        if(targetMission) {
+          const btn = targetMission.querySelector('.toggle-file-btn');
+          if(btn && btn.getAttribute('aria-expanded') === 'false') {
+            btn.click();
+          }
+          targetMission.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    /* 3. Dossier Toggles */
+    const toggleBtns = document.querySelectorAll('.toggle-file-btn');
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = this.getAttribute('aria-controls');
+        const content = document.getElementById(targetId);
+        const icon = this.querySelector('.toggle-icon');
+        const text = this.querySelector('.btn-text');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+        if(isExpanded) {
+          this.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          icon.textContent = '▼';
+          text.textContent = 'OPEN FILE';
+          this.classList.replace('bg-slate-800', 'bg-black');
+        } else {
+          this.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          icon.textContent = '▲';
+          text.textContent = 'SEAL FILE';
+          this.classList.replace('bg-black', 'bg-slate-800');
+        }
+      });
+    });
+
+    /* 4. Real-time persistent countdown logic */
+    // Start: 26 Sep 2026 12:00 AM IST (UTC: 25 Sep 18:30:00)
+    // End: 27 Sep 2026 12:00 PM IST (UTC: 27 Sep 06:30:00)
+    const startTimeUTC = new Date(Date.UTC(2026, 8, 25, 18, 30, 0)).getTime();
+    const endTimeUTC = new Date(Date.UTC(2026, 8, 27, 6, 30, 0)).getTime();
+    
+    const hEl = document.getElementById('hours');
+    const mEl = document.getElementById('minutes');
+    const sEl = document.getElementById('seconds');
+    const displayEl = document.getElementById('countdown-display');
+    const closedEl = document.getElementById('countdown-closed');
+    const statusIndicators = document.querySelectorAll('.mission-status');
+    const heroStatusText = document.getElementById('status-indicator');
+
+    function updateClock() {
+      const now = new Date().getTime();
+
+      if (now < startTimeUTC) {
+        // Pre-event: cap at 36:00:00
+        hEl.textContent = '36';
+        mEl.textContent = '00';
+        sEl.textContent = '00';
+        heroStatusText.textContent = "MISSION STATUS: STANDBY";
+        return;
+      }
+
+      if (now >= endTimeUTC) {
+        // Post-event
+        displayEl.classList.add('hidden');
+        closedEl.classList.remove('hidden');
+        heroStatusText.textContent = "MISSION STATUS: CONCLUDED";
+        statusIndicators.forEach(el => {
+          el.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span>SUBMISSIONS CLOSED`;
+          el.classList.replace('border-black', 'border-red-500');
+          el.classList.add('text-red-700');
+        });
+        return;
+      }
+
+      // Active event
+      const diff = endTimeUTC - now;
+      const totalSeconds = Math.floor(diff / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+
+      hEl.textContent = String(h).padStart(2, '0');
+      mEl.textContent = String(m).padStart(2, '0');
+      sEl.textContent = String(s).padStart(2, '0');
+      heroStatusText.textContent = "MISSION STATUS: ACTIVE";
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* 5. Sharing Functions */
+    function showToast() {
+      const t = document.getElementById('toast');
+      t.style.bottom = '100px';
+      t.style.opacity = '1';
+      setTimeout(() => {
+        t.style.bottom = '-80px';
+        t.style.opacity = '0';
+      }, 3000);
+    }
+
+    window.copyLink = function(id) {
+      const url = window.location.origin + window.location.pathname + '#' + id;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(showToast).catch(err => {
+          // fallback
+          const input = document.createElement('input');
+          input.value = url;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          document.body.removeChild(input);
+          showToast();
+        });
+      }
+    };
+
+    window.shareWA = function(id, title) {
+      const url = window.location.origin + window.location.pathname + '#' + id;
+      const text = `Bit N Build Mission Unlocked: ${title} — ${url}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    };
+  </script>
+</body>
+</html>
